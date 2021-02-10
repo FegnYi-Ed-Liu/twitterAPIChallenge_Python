@@ -4,9 +4,10 @@ from tweepy.streaming import StreamListener
 from tweepy import OAuthHandler
 from tweepy import Stream
 
-import twitter_credentials
+from src import credentials
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 
 
 # # # # TWITTER CLIENT # # # #
@@ -43,8 +44,8 @@ class TwitterClient():
 class TwitterAuthenticator():
 
     def authenticate_twitter_app(self):
-        auth = OAuthHandler(twitter_credentials.CONSUMER_KEY, twitter_credentials.CONSUMER_SECRET)
-        auth.set_access_token(twitter_credentials.ACCESS_TOKEN, twitter_credentials.ACCESS_TOKEN_SECRET)
+        auth = OAuthHandler(credentials.CONSUMER_KEY, credentials.CONSUMER_SECRET)
+        auth.set_access_token(credentials.ACCESS_TOKEN, credentials.ACCESS_TOKEN_SECRET)
         return auth
 
 
@@ -99,7 +100,7 @@ class TweetAnalyzer():
     """
 
     def tweets_to_data_frame(self, tweets):
-        df = pd.DataFrame(data=[tweet.text for tweet in tweets], columns=['Tweets'])
+        df = pd.DataFrame(data=[tweet.text for tweet in tweets], columns=['tweets'])
 
         df['id'] = np.array([tweet.id for tweet in tweets])
         df['len'] = np.array([len(tweet.text) for tweet in tweets])
@@ -124,4 +125,40 @@ if __name__ == '__main__':
 
     df = tweet_analyzer.tweets_to_data_frame(tweets)
 
-    print(df.head(10))
+    # Get average length over all tweets:
+    print(np.mean(df['len']))
+
+    # Get the number of likes for the most liked tweet:
+    print(np.max(df['likes']))
+
+    # Get the number of retweets for the most retweeted tweet:
+    print(np.max(df['retweets']))
+
+    # print(df.head(10))
+
+
+    # Get the number of retweets for the most retweeted tweet:
+    print(np.max(df['retweets']))
+
+    # print(df.head(10))
+
+    # Time Series
+    time_likes = pd.Series(data=df['len'].values, index=df['date'])
+    time_likes.plot(figsize=(16, 4), color='r')
+    plt.show()
+
+    time_favs = pd.Series(data=df['likes'].values, index=df['date'])
+    time_favs.plot(figsize=(16, 4), color='r')
+    plt.show()
+
+    time_retweets = pd.Series(data=df['retweets'].values, index=df['date'])
+    time_retweets.plot(figsize=(16, 4), color='r')
+    plt.show()
+
+    #Layered Time Series:
+    time_likes = pd.Series(data=df['likes'].values, index=df['date'])
+    time_likes.plot(figsize=(16, 4), label="likes", legend=True)
+
+    time_retweets = pd.Series(data=df['retweets'].values, index=df['date'])
+    time_retweets.plot(figsize=(16, 4), label="retweets", legend=True)
+    plt.show()
