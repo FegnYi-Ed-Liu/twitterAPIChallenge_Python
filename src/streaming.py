@@ -6,7 +6,7 @@ from .credentials import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, ACCESS_TOK
 
 class TwitterStreamer:
 
-    def stream_tweets(self, output_filename, hash_tag_list):
+    def stream_tweets(self, output_filename, hash_tag_list, lang=None):
 
         listener = StdoutListener(output_filename=output_filename)
 
@@ -15,7 +15,8 @@ class TwitterStreamer:
 
         stream = Stream(auth=auth, listener=listener)
 
-        stream.filter(track=hash_tag_list)
+        stream.filter(track=hash_tag_list,
+                      languages=lang)
 
 
 class StdoutListener(StreamListener):
